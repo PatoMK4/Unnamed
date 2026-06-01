@@ -165,6 +165,12 @@ Still open:
 
 ## 13. Backend / sync (Supabase)
 
+**Status: provisioned.** Project `unnamed` (ref `iwzsqxkfbqyddnalsbrb`,
+eu-west-1, free tier). Schema + RLS applied; security advisors clean. Full
+details and client config in `supabase/README.md`; schema in
+`supabase/migrations/`. (The pre-existing "Untrained" project was left
+untouched — we started fresh per decision.)
+
 - **Local-first, cloud-synced.** Room (SQLite) on device is the source of truth
   for offline logging; Supabase (Postgres) is the sync + backup layer. Writes
   queue locally and push when online.
