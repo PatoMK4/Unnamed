@@ -1,15 +1,47 @@
 # Seed data
 
 Canonical reference data loaded into the app's database on first run, then
-editable by the user. Kept as plain JSON so it's reviewable in version control.
+editable by the user. Kept as JSON so it's reviewable in version control.
 
-## `exercise_library.json`
+## Files
 
-The hand-curated starter exercise set (65 exercises across all 10 movement
-patterns). This is the backbone of data quality: the chat parser matches your
-natural-language input against these records so that "incline db press" and
-"incline dumbbell bench" both resolve to the **same** canonical exercise, which
-keeps trends and AI analysis from fragmenting.
+| File | What it is |
+|------|------------|
+| `exercise_library.json` | **Generated** curated library (883 exercises). Do not hand-edit. |
+| `exercise_curated_overrides.json` | Hand-written entries that win on overlap. Edit this. |
+| `build_exercise_library.py` | Build script that produces `exercise_library.json`. |
+
+## How the library is built
+
+The library is **derived, not hand-typed**: we take the public-domain
+[`free-exercise-db`](https://github.com/yuhonas/free-exercise-db) (~873
+exercises, Unlicense) and run correction/normalization passes onto Unnamed's
+canonical schema, then merge the hand-curated overrides on top.
+
+```
+free-exercise-db (raw, messy) ─┐
+                               ├─▶ build_exercise_library.py ─▶ exercise_library.json
+exercise_curated_overrides ────┘   (normalize + merge + validate)
+```
+
+Correction passes the script performs:
+1. **Equipment** → canonical vocab (`body only`→`bodyweight`, `e-z curl bar`→
+   `ez_bar`, `kettlebells`→`kettlebell`, …).
+2. **Muscles** → canonical vocab (`abdominals`→`abs`, `quadriceps`→`quads`,
+   `middle back`→`upper_back`, …), and the generic `shoulders` is **upgraded**
+   to `front_/side_/rear_delts` by name heuristics where confidently inferable
+   (lateral raise→side, reverse fly/face pull→rear, press/OHP→front). Where the
+   head is genuinely ambiguous (most compound presses), it stays `shoulders`.
+3. **Movement pattern** (absent from the source) is **derived** from name +
+   force + muscles.
+4. **Aliases** are generated (strip "- Medium Grip" suffixes, add bb/db
+   abbreviations); any alias that would map to >1 exercise is dropped so the
+   parser never silently mis-resolves.
+5. **Merge**: when a source exercise matches a curated override (by name or
+   alias), the override's aliases/muscles/pattern win, and we keep the source's
+   `instructions` + `images`.
+
+Re-run any time: `python3 data/build_exercise_library.py`
 
 ### Record format
 
@@ -24,46 +56,55 @@ keeps trends and AI analysis from fragmenting.
   "secondary_muscles": ["front_delts", "triceps"],
   "is_bodyweight": false,              // load comes from added weight only?
   "allows_added_load": true,           // can weight be added (belt/plate/db)?
-  "is_unilateral": true                // one limb at a time (per-side logging)?
+  "is_unilateral": true,               // one limb at a time (per-side logging)?
+  "category": "strength",              // strength|stretching|plyometrics|cardio|...
+  "mechanic": "compound",              // compound|isolation|null
+  "force": "push",                     // push|pull|static|null
+  "level": "beginner",                 // beginner|intermediate|expert|null
+  "instructions": ["...", "..."],      // step-by-step, shown in the app
+  "images": ["Incline_DB_Press/0.jpg"] // relative paths in free-exercise-db
 }
 ```
 
 Allowed values for `movement_pattern`, `equipment`, and the muscle fields are
 enumerated at the top of `exercise_library.json` (`movement_patterns`,
-`equipment_vocabulary`, `muscle_vocabulary`). Keep new entries within these
+`equipment_vocabulary`, `muscle_vocabulary`). Keep entries within these
 vocabularies so filtering and analysis stay consistent.
+
+> **Note on `shoulders`:** `shoulders` = unspecified deltoid (used when the head
+> can't be inferred); `front_delts`/`side_delts`/`rear_delts` are used when the
+> specific head is known. Mixed granularity is intentional and honest.
 
 ### How the parser uses it
 
 1. On-device speech-to-text produces raw text.
-2. The parser lowercases the spoken exercise phrase and matches it against
-   `name` + `aliases` across all records (fuzzy match for typos/mishearings).
+2. The parser matches the spoken exercise phrase against `name` + `aliases`
+   across all records (fuzzy match for typos/mishearings).
 3. The matched `id` is attached to the set; numbers (reps, weight, RPE,
    fatigue) and subjective notes are extracted alongside.
-4. If no confident match, the confirmation card asks you to pick/confirm the
-   exercise — and you can save the spoken phrase as a new alias so it matches
-   next time. This is how the library grows from real usage.
+4. If no confident match, the confirmation card asks you to pick/confirm — and
+   you can save the spoken phrase as a new alias (added to the overrides) so it
+   matches next time. This is how the library grows from real usage.
 
-### Extending the set
+### Extending / fixing the set
 
-- Add a new object to the `exercises` array with a unique `id`.
-- Give it generous, realistic `aliases` (how people actually *say* it).
-- Avoid alias clashes with existing exercises (an alias should resolve to
-  exactly one exercise).
+- Add or correct entries in `exercise_curated_overrides.json` (matched to the
+  source by `name`/`aliases`), then re-run the build.
+- Give new entries generous, realistic `aliases` (how people actually *say* it).
 - `is_unilateral: true` signals the logger to capture per-side data.
 - `allows_added_load: false` is for movements where extra load doesn't apply
-  (e.g. ab wheel rollout); bodyweight movements that *can* be loaded (pull-ups,
-  dips) use `is_bodyweight: true` + `allows_added_load: true`.
+  (stretches, ab wheel rollout). Bodyweight movements that *can* be loaded
+  (pull-ups, dips) use `is_bodyweight: true` + `allows_added_load: true`.
 
 ## Subjective scales (referenced by the data model)
 
-These definitions are the agreed scales for the `rpe` and `fatigue` fields on a
-set, so logging and AI analysis interpret them the same way.
+Agreed scales for the `rpe` and `fatigue` fields on a set, so logging and AI
+analysis interpret them the same way.
 
 ### RPE — Rate of Perceived Exertion (per set)
 
-How hard the set was, on the standard **RIR-based 1–10 scale** (half-points
-allowed). Higher = closer to failure.
+Standard **RIR-based 1–10 scale** (half-points allowed). Higher = closer to
+failure.
 
 | RPE | Meaning |
 |-----|---------|
@@ -77,9 +118,9 @@ allowed). Higher = closer to failure.
 
 ### Fatigue (per set)
 
-A simpler **1–5 scale** capturing how drained you felt *on that set*
-(distinct from RPE: a set can be high-RPE but low systemic fatigue, or vice
-versa). Used by the recovery/injury skills later.
+A **1–5 scale** for how drained you felt *on that set* (distinct from RPE: a set
+can be high-RPE but low systemic fatigue, or vice versa). Used by the
+recovery/injury skills later.
 
 | Fatigue | Meaning |
 |---------|---------|
@@ -91,3 +132,9 @@ versa). Used by the recovery/injury skills later.
 
 > Both are optional per set — the logger never blocks on them — but the more
 > consistently they're captured, the better the coaching skills perform.
+
+## Licensing
+
+Exercise content (names, instructions, images) derives from
+[`free-exercise-db`](https://github.com/yuhonas/free-exercise-db), released
+under the **Unlicense** (public domain). See `NOTICE` at the repo root.

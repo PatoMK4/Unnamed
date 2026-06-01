@@ -1,0 +1,12 @@
+Unnamed includes exercise reference data derived from third-party sources.
+
+free-exercise-db
+----------------
+Exercise names, instructions, and image references in data/exercise_library.json
+are derived from the free-exercise-db project:
+
+  https://github.com/yuhonas/free-exercise-db
+
+free-exercise-db is released under the Unlicense (public domain dedication).
+The data has been normalized and corrected into Unnamed's canonical schema by
+data/build_exercise_library.py.

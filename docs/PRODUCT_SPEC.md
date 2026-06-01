@@ -144,9 +144,11 @@ within-bounds adjustment. Skills are scaffolded in v1 but filled in over time.
 ## 11. Decisions & open questions
 
 Resolved:
-- [x] **Exercise library: hand-curated starter set.** 65 exercises across all
-      movement patterns, with rich aliases for the parser. See
-      `data/exercise_library.json` and `data/README.md`.
+- [x] **Exercise library: large curated DB.** 883 exercises, built by
+      normalizing the public-domain free-exercise-db into our canonical schema
+      and merging the hand-curated overrides on top (rich aliases, fine-grained
+      delts, derived movement patterns, plus instructions + images). Generated
+      by `data/build_exercise_library.py`; see `data/README.md`.
 - [x] **RPE = standard RIR-based 1–10 (half-points); fatigue = 1–5.** Defined
       in `data/README.md`. Both optional per set.
 - [x] **Backend: Supabase sync early.** Don't stay local-only; stand up sync
