@@ -141,15 +141,41 @@ within-bounds adjustment. Skills are scaffolded in v1 but filled in over time.
   (e.g. Supabase for auth + sync + a proxy edge function) is a candidate when we
   get there.
 
-## 11. Open questions / next decisions
+## 11. Decisions & open questions
 
-- [ ] Exercise library: hand-curate a starter set, or import an open dataset?
-- [ ] RPE scale: 1–10 with half-points? Define fatigue scale precisely.
+Resolved:
+- [x] **Exercise library: hand-curated starter set.** 65 exercises across all
+      movement patterns, with rich aliases for the parser. See
+      `data/exercise_library.json` and `data/README.md`.
+- [x] **RPE = standard RIR-based 1–10 (half-points); fatigue = 1–5.** Defined
+      in `data/README.md`. Both optional per set.
+- [x] **Backend: Supabase sync early.** Don't stay local-only; stand up sync
+      from the start so friends can use it and we avoid a later migration.
+      Supabase also gives auth + a future edge-function proxy for the AI key.
+      Local DB (Room) remains the offline source of truth; Supabase is the
+      sync/backup layer. (See §13.)
+
+Still open:
 - [ ] How much conversation memory does the logging chat keep per session?
 - [ ] Confirmation UX: one card per exercise, or per message (could be multiple
       exercises)?
-- [ ] Backend timing: stay fully local for v1, or stand up sync early so
-      friends can use it?
+- [ ] Sync conflict policy (last-write-wins vs per-field merge) for offline edits.
+
+## 13. Backend / sync (Supabase)
+
+- **Local-first, cloud-synced.** Room (SQLite) on device is the source of truth
+  for offline logging; Supabase (Postgres) is the sync + backup layer. Writes
+  queue locally and push when online.
+- **Auth:** Supabase Auth from the start (needed the moment >1 person uses it).
+  Each row is owned by a user; Row-Level Security isolates per-user data.
+- **AI key safety:** the Anthropic key lives in a Supabase **edge function**
+  that the app calls — never embedded in the APK. This also lets us swap models
+  or add caching server-side without shipping an app update.
+- **Schema:** the Postgres schema mirrors §8 with `user_id` on every owned
+  table + RLS policies. The canonical exercise library seeds a shared,
+  read-only `exercises` table (plus per-user custom additions).
+- **Conflict handling:** start simple (last-write-wins per row, with updated_at
+  timestamps); revisit if real conflicts show up.
 
 ## 12. Phased roadmap
 
