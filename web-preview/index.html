@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1F6E5C" />
+<title>Unnamed — preview</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="phone">
+    <header class="appbar">
+      <div class="brand">
+        <span class="logo">🏋️</span>
+        <div>
+          <div class="title">Unnamed</div>
+          <div class="subtitle" id="subtitle">Log a set…</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- LOG TAB -->
+    <main class="screen" id="screen-log">
+      <div class="chat" id="chat"></div>
+      <div class="composer">
+        <input id="input" type="text" autocomplete="off"
+               placeholder='e.g. "incline db press 3x8 at 80kg rpe 8, shoulder felt heavy"' />
+        <button id="mic" class="icon-btn" title="Voice input">🎙️</button>
+        <button id="send" class="icon-btn primary" title="Send">➤</button>
+      </div>
+    </main>
+
+    <!-- HISTORY TAB -->
+    <main class="screen hidden" id="screen-history">
+      <div class="list" id="history"></div>
+    </main>
+
+    <!-- COACH TAB -->
+    <main class="screen hidden" id="screen-coach">
+      <div class="coach">
+        <h2>AI Coach</h2>
+        <p>Coming soon. Once your data builds up and the AI is switched on,
+           you'll ask things like <em>"how's my bench trending?"</em> or
+           <em>"build today's session around my sore shoulder"</em> here.</p>
+        <p class="muted">In the real app this calls a server-side function that
+           keeps the AI key safe — inert until activated, so there's no cost yet.</p>
+      </div>
+    </main>
+
+    <nav class="bottomnav">
+      <button class="nav active" data-tab="log"><span>💬</span>Log</button>
+      <button class="nav" data-tab="history"><span>🗓️</span>History</button>
+      <button class="nav" data-tab="coach"><span>📈</span>Coach</button>
+    </nav>
+  </div>
+
+  <p class="disclaimer">
+    Front-end preview of the Android app's logging flow. Data is saved in your
+    browser only (this preview isn't wired to the live database yet).
+  </p>
+
+  <script src="app.js"></script>
+</body>
+</html>

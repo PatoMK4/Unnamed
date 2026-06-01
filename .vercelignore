@@ -1,0 +1,13 @@
+# Only the static preview needs to ship to Vercel.
+app/
+supabase/
+docs/
+data/
+gradle/
+.gradle/
+gradlew
+gradlew.bat
+build.gradle.kts
+settings.gradle.kts
+gradle.properties
+*.iml
