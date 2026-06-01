@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose drives the real theming (ui/theme). This is the launch/base
+         theme so the activity has a valid Material3 parent before Compose loads. -->
+    <style name="Theme.Unnamed" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
