@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.Flow
  */
 class WorkoutRepository(private val dao: WorkoutDao) {
 
+    /** Invoked after a successful commit so the app can trigger a sync. */
+    var afterCommit: (() -> Unit)? = null
+
     fun observeSessions(): Flow<List<WorkoutSession>> = dao.observeSessions()
 
     fun observeSets(sessionId: String): Flow<List<SetEntry>> = dao.observeSets(sessionId)
@@ -57,5 +60,6 @@ class WorkoutRepository(private val dao: WorkoutDao) {
             // Attach notes only to the first set to avoid duplication.
             dao.commitLog(set, if (i == 0) notes else emptyList())
         }
+        afterCommit?.invoke()
     }
 }

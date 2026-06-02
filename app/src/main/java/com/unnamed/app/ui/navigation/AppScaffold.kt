@@ -3,6 +3,7 @@ package com.unnamed.app.ui.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material3.Icon
@@ -20,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.unnamed.app.ui.screens.AccountScreen
 import com.unnamed.app.ui.screens.CoachScreen
 import com.unnamed.app.ui.screens.HistoryScreen
 import com.unnamed.app.ui.screens.LogScreen
@@ -28,6 +30,7 @@ private enum class Tab(val route: String, val label: String, val icon: ImageVect
     Log("log", "Log", Icons.AutoMirrored.Filled.Chat),
     History("history", "History", Icons.Filled.History),
     Coach("coach", "Coach", Icons.Filled.Insights),
+    Account("account", "Account", Icons.Filled.AccountCircle),
 }
 
 @Composable
@@ -63,6 +66,7 @@ fun AppScaffold() {
             composable(Tab.Log.route) { LogScreen() }
             composable(Tab.History.route) { HistoryScreen() }
             composable(Tab.Coach.route) { CoachScreen() }
+            composable(Tab.Account.route) { AccountScreen() }
         }
     }
 }

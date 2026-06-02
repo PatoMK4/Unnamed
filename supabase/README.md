@@ -66,3 +66,29 @@ the app is in place.
 supabase functions deploy ai-coach
 supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+## Auth & sync (email + password, offline-first)
+
+The Android app is offline-first: Room is the source of truth and **an account is
+optional**. Signing in (email + password) claims the device's local data and
+turns on two-way sync.
+
+- **Push:** local rows with `synced=0` are upserted (stamped with `user_id`),
+  then marked synced. **Pull:** rows changed since `lastSync` (RLS scopes them to
+  the user) are upserted into Room. Conflict policy: last-write-wins by
+  `updated_at`; local unsynced rows are never clobbered.
+- Implemented in `app/.../data/auth/AuthManager.kt`,
+  `app/.../data/sync/SyncManager.kt`, with DTO mapping in
+  `app/.../data/remote/`.
+
+### Required dashboard step (one-time)
+
+For the "me + friends" stage, **disable email confirmation** so sign-up works
+without configuring SMTP:
+
+> Authentication → Providers → **Email** → turn **off** "Confirm email" (and
+> keep "Enable email provider" on).
+
+Otherwise new accounts can't sign in until they click a confirmation email, and
+Supabase's built-in mailer is rate-limited. Revisit (enable confirmation + a real
+SMTP/email provider) before any public release.

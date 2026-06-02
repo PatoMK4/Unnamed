@@ -165,11 +165,14 @@ Still open:
 
 ## 13. Backend / sync (Supabase)
 
-**Status: provisioned.** Project `unnamed` (ref `iwzsqxkfbqyddnalsbrb`,
-eu-west-1, free tier). Schema + RLS applied; security advisors clean. Full
-details and client config in `supabase/README.md`; schema in
-`supabase/migrations/`. (The pre-existing "Untrained" project was left
-untouched — we started fresh per decision.)
+**Status: provisioned + client sync/auth implemented.** Project `unnamed`
+(ref `iwzsqxkfbqyddnalsbrb`, eu-west-1, free tier). Schema + RLS applied;
+security advisors clean. Email+password auth and offline-first two-way sync are
+implemented in the app (`data/auth/AuthManager.kt`, `data/sync/SyncManager.kt`);
+account is optional and claims local data on sign-in. Requires disabling email
+confirmation in the dashboard (see `supabase/README.md`). Full details and
+client config in `supabase/README.md`; schema in `supabase/migrations/`. (The
+pre-existing "Untrained" project was left untouched — we started fresh.)
 
 - **Local-first, cloud-synced.** Room (SQLite) on device is the source of truth
   for offline logging; Supabase (Postgres) is the sync + backup layer. Writes
