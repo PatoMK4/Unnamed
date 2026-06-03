@@ -22,14 +22,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unnamed.app.ui.screens.AccountScreen
-import com.unnamed.app.ui.screens.CoachScreen
 import com.unnamed.app.ui.screens.HistoryScreen
 import com.unnamed.app.ui.screens.LogScreen
+import com.unnamed.app.ui.screens.ProgressScreen
+import com.unnamed.app.ui.screens.SessionDetailScreen
 
 private enum class Tab(val route: String, val label: String, val icon: ImageVector) {
     Log("log", "Log", Icons.AutoMirrored.Filled.Chat),
     History("history", "History", Icons.Filled.History),
-    Coach("coach", "Coach", Icons.Filled.Insights),
+    Progress("progress", "Progress", Icons.Filled.Insights),
     Account("account", "Account", Icons.Filled.AccountCircle),
 }
 
@@ -64,9 +65,15 @@ fun AppScaffold() {
             modifier = Modifier.padding(padding),
         ) {
             composable(Tab.Log.route) { LogScreen() }
-            composable(Tab.History.route) { HistoryScreen() }
-            composable(Tab.Coach.route) { CoachScreen() }
+            composable(Tab.History.route) {
+                HistoryScreen(onOpenSession = { id -> nav.navigate("session/$id") })
+            }
+            composable(Tab.Progress.route) { ProgressScreen() }
             composable(Tab.Account.route) { AccountScreen() }
+            composable("session/{sessionId}") { entry ->
+                val id = entry.arguments?.getString("sessionId").orEmpty()
+                SessionDetailScreen(sessionId = id, onBack = { nav.popBackStack() })
+            }
         }
     }
 }

@@ -20,8 +20,18 @@ interface WorkoutDao {
     @Query("SELECT * FROM workout_sessions WHERE id = :id")
     suspend fun getSession(id: String): WorkoutSession?
 
+    @Query("SELECT * FROM workout_sessions WHERE id = :id")
+    fun observeSession(id: String): Flow<WorkoutSession?>
+
     @Query("SELECT * FROM set_entries WHERE sessionId = :sessionId ORDER BY setIndex")
     fun observeSets(sessionId: String): Flow<List<SetEntry>>
+
+    /** Every set across all sessions — fed into the analytics engine. */
+    @Query("SELECT * FROM set_entries")
+    fun observeAllSets(): Flow<List<SetEntry>>
+
+    @Query("SELECT * FROM notes WHERE sessionId = :sessionId ORDER BY createdAt")
+    fun observeNotes(sessionId: String): Flow<List<Note>>
 
     @Query("SELECT COUNT(*) FROM set_entries WHERE sessionId = :sessionId AND exerciseId = :exerciseId")
     suspend fun countSetsForExercise(sessionId: String, exerciseId: String): Int

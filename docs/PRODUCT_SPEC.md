@@ -194,7 +194,13 @@ pre-existing "Untrained" project was left untouched — we started fresh.)
    + confirmation card + local DB + a session/history view. *Validate it feels
    magic and you use it daily.*
 2. **Phase B — Analyst:** trends (volume, estimated 1RM, RPE/fatigue over time)
-   + AI Q&A over your data.
+   + AI Q&A over your data. *In progress (non-AI half done):* a pure analytics
+   engine (`data/analytics/`) derives per-set metrics (volume load, Epley e1RM),
+   per-session summaries, weekly sets-per-muscle, and personal records from the
+   raw entities. It feeds a tap-through **Session Detail** screen, summary cards
+   on **History**, and a **Progress** tab (which replaced the empty Coach tab).
+   Charts are hand-drawn with Compose Canvas (no chart dependency). Still to do:
+   per-exercise progress charts over time, and the AI Q&A layer.
 3. **Phase C — Nutrition:** food DB + barcode + unit normalization + macro
    tracking.
 4. **Phase D — Coaching skills:** training, then injury-prevention, then deeper

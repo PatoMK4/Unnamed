@@ -5,6 +5,7 @@ import com.unnamed.app.data.auth.AuthManager
 import com.unnamed.app.data.exercise.ExerciseLibrary
 import com.unnamed.app.data.local.AppDatabase
 import com.unnamed.app.data.remote.Supabase
+import com.unnamed.app.data.repository.StatsRepository
 import com.unnamed.app.data.repository.WorkoutRepository
 import com.unnamed.app.data.sync.SyncManager
 import com.unnamed.app.logging.SetParser
@@ -22,6 +23,8 @@ class UnnamedApp : Application() {
         private set
     lateinit var repository: WorkoutRepository
         private set
+    lateinit var stats: StatsRepository
+        private set
     lateinit var parser: SetParser
         private set
     lateinit var auth: AuthManager
@@ -38,6 +41,7 @@ class UnnamedApp : Application() {
         library = ExerciseLibrary.get(this)
         val dao = AppDatabase.get(this).workoutDao()
         repository = WorkoutRepository(dao)
+        stats = StatsRepository(dao, library)
         parser = SetParser(library)
         auth = AuthManager()
         sync = SyncManager(this, dao, auth)
