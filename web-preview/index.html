@@ -35,28 +35,32 @@
       <div class="list" id="history"></div>
     </main>
 
-    <!-- COACH TAB -->
-    <main class="screen hidden" id="screen-coach">
-      <div class="coach">
-        <h2>AI Coach</h2>
-        <p>Coming soon. Once your data builds up and the AI is switched on,
-           you'll ask things like <em>"how's my bench trending?"</em> or
-           <em>"build today's session around my sore shoulder"</em> here.</p>
-        <p class="muted">In the real app this calls a server-side function that
-           keeps the AI key safe — inert until activated, so there's no cost yet.</p>
+    <!-- SESSION DETAIL (opened from History) -->
+    <main class="screen hidden" id="screen-detail">
+      <div class="subhead">
+        <button id="back" class="back" title="Back">←</button>
+        <span id="detail-title">Session</span>
       </div>
+      <div class="list" id="detail-body"></div>
+    </main>
+
+    <!-- PROGRESS TAB -->
+    <main class="screen hidden" id="screen-progress">
+      <div class="list" id="progress-body"></div>
     </main>
 
     <nav class="bottomnav">
       <button class="nav active" data-tab="log"><span>💬</span>Log</button>
       <button class="nav" data-tab="history"><span>🗓️</span>History</button>
-      <button class="nav" data-tab="coach"><span>📈</span>Coach</button>
+      <button class="nav" data-tab="progress"><span>📈</span>Progress</button>
     </nav>
   </div>
 
   <p class="disclaimer">
-    Front-end preview of the Android app's logging flow. Data is saved in your
-    browser only (this preview isn't wired to the live database yet).
+    Front-end preview of the Android app. The logging parser, the analytics
+    engine (volume load, Epley e1RM, sets-per-muscle, PRs), History, Session
+    Detail and Progress all run client-side here. Data is saved in your browser
+    only — this preview isn't wired to the live database.
   </p>
 
   <script src="app.js"></script>
